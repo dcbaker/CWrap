@@ -25,7 +25,7 @@ development against CWrap, you will not need to install these files
 
 =end
 
-require './conversion'
+require './convert'
 require './exceptions'
 
 
@@ -67,5 +67,28 @@ describe Conversion::Option, '#to_autotools' do
   end
 end
 
+describe Conversion::Switch, '#to_autotools' do
+  it "Should add --enable- to bool=true options" do
+    test = Conversion::Switch.new('PROJECT_WITH_FOO', 'foo')
+    test.to_autotools(true).should eq('--enable-foo')
+  end
+
+  it "Should add --disable- to bool=false options" do
+    test = Conversion::Switch.new('PROJECT_WITH_FOO', 'foo')
+    test.to_autotools(false).should eq('--disable-foo')
+  end
+
+  it "should not accept values other than true or false as an argument" do
+    test = Conversion::Switch.new('PROJECT_WITH_FOO', 'foo')
+    expect{ test.to_autotools(0) }.to raise_error(Exceptions::OptionError)
+  end
+end
+
+describe Conversion::Switch, '#to_cmake' do
+  it "should not accept values other than true or false as an argument" do
+    test = Conversion::Switch.new('PROJECT_WITH_FOO', 'foo')
+    expect{ test.to_cmake("foo") }.to raise_error(Exceptions::OptionError)
+  end
+end
 
 # vim: ft=rspec

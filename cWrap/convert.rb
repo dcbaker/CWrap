@@ -91,15 +91,22 @@ module Conversion
   #     :auto: the autotools comand
 
   class Switch < Option
-    
-    def to_autotools(bool)
-      if bool == true
-        return "--enable-#{@auto}}"
-      else
-        return "--disable-#{@auto}}"
-      end
+
+    def to_cmake(bool)
+      raise Exceptions::OptionError, "Argument should be a boolean" unless [true, false].include?(bool)
+      super
     end
     
+    def to_autotools(bool)
+      raise Exceptions::OptionError, "Argument should be a boolean" unless [true, false].include?(bool)
+
+      if bool
+        return "--enable-#{@auto}"
+      else
+        return "--disable-#{@auto}"
+      end
+    end
+
   end
 
 end
