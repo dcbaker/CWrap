@@ -1,3 +1,4 @@
+# encoding: UTF-8
 # Copyright (c) 2014 Dylan Baker
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,22 +19,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-=begin rdoc
-Provides classes that store and convert between autotools and cmake option styles
-=end
+# Provides classes that store and convert between autotools and cmake option
+# styles
 
 require './exceptions'
 
 module Conversion
-
   # Class for wrapping simple options
   #
   # This class should also operate as the base class for more complex options.
   # This class particuarly is used for non boolean operators
   #
   # Takes two options
-
   class Option
     attr_reader :options, :cmake, :auto
 
@@ -44,12 +41,12 @@ module Conversion
     #     :auto: the name of the autotools command (no leading dashes)
     # ---
     # XXX: Does autotools have short options?
-
     def initialize(cmake, auto)
       if cmake.start_with?('-')
-        raise Exceptions::OptionError, "Do not preface cmake options with -"
+        fail Exceptions::OptionError, 'Do not preface cmake options with -'
       elsif auto.start_with?('-')
-        raise Exceptions::OptionError, "Do not preface autotools options with - or --"
+        fail Exceptions::OptionError,
+             'Do not preface autotools options with - or --'
       end
 
       @cmake = cmake
@@ -62,7 +59,6 @@ module Conversion
     #     returns a Struct with two values:
     #     :command: the cmake command
     #     :value: the value attached to that command
-
     def to_cmake(val)
       "-#{@cmake}=#{val}"
     end
@@ -73,40 +69,39 @@ module Conversion
     #     returns a Struct with two values:
     #     :command: the autotools command
     #     :value: the value attached to that command
-
     def to_autotools(val)
       "--#{@auto}=#{val}"
     end
-
   end
 
   # Class for wrapping switch options.
   #
-  # Cmake does not use switches for options, it uses -command=<bool> instead, so
-  # we need to have a wrapper for converting from CMAKE_OPTION=<bool> to
+  # Cmake does not use switches for options, it uses -command=<bool> instead,
+  # so we need to have a wrapper for converting from CMAKE_OPTION=<bool> to
   # --(enable/disable)-option
   #
   # === Arguments:
   #     :cmake: the cmake command
   #     :auto: the autotools comand
-
   class Switch < Option
-
+    # FIXME: Add documentation
     def to_cmake(bool)
-      raise Exceptions::OptionError, "Argument should be a boolean" unless [true, false].include?(bool)
+      unless [true, false].include?(bool)
+        fail Exceptions::OptionError, 'Argument should be a boolean'
+      end
+
       super
     end
-    
-    def to_autotools(bool)
-      raise Exceptions::OptionError, "Argument should be a boolean" unless [true, false].include?(bool)
 
-      if bool
+    # FIXME: Add documentation
+    def to_autotools(bool)
+      if ! [true, false].include?(bool)
+        fail Exceptions::OptionError, 'Argument should be a boolean'
+      elsif bool
         return "--enable-#{@auto}"
       else
         return "--disable-#{@auto}"
       end
     end
-
   end
-
 end
