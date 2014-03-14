@@ -85,12 +85,16 @@ module Conversion
   #     :auto: the autotools comand
   class Switch < Option
     # FIXME: Add documentation
-    def to_cmake(bool)
-      unless [true, false].include?(bool)
-        fail Exceptions::OptionError, 'Argument should be a boolean'
-      end
+    # options should be a hash with true => 'option', and false => option
+    def initialize(cmake, auto, options)
+      super(cmake, auto)
+      @options = options
+    end
 
-      super
+    # FIXME: Add documentation
+    def to_cmake(bool)
+      return "-#{@cmake}=#{@options[bool]}" unless [true, false].include?(bool)
+      fail Exceptions::OptionError, 'Argument should be a boolean'
     end
 
     # FIXME: Add documentation
